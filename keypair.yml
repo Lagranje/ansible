@@ -1,0 +1,20 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    #your region
+    region: us-east-2
+    keyname: danylo-key-pair-useast
+  tasks:
+    - name: create key pair
+      ec2_key:
+        region: "{{ region }}"
+        name: "{{ keyname }}"
+      register: mykey
+    
+    - debug: var=mykey
+    
+    - name: write to file
+      copy: content="{{ mykey.key.private_key }}" dest="~/.ssh/{{ keyname }}.pem" mode=0600
+      when: mykey.changed
